@@ -247,6 +247,14 @@ const contactForm = document.querySelector('.contact-form');
 contactForm.addEventListener('submit', (e) => {
     e.preventDefault();
 
+    const submitBtn = contactForm.querySelector('button[type="submit"]');
+    const originalBtnText = submitBtn.innerHTML;
+    
+    // Change button state to show loading
+    submitBtn.innerHTML = '<span>Sending...</span> <i class="fas fa-spinner fa-spin"></i>';
+    submitBtn.style.opacity = '0.7';
+    submitBtn.disabled = true;
+
     // Get form data
     const formData = new FormData(contactForm);
     const name = formData.get('name');
@@ -254,27 +262,41 @@ contactForm.addEventListener('submit', (e) => {
     const subject = formData.get('subject');
     const message = formData.get('message');
 
-    // Show success message (you can replace this with actual form submission)
-    alert(`Thank you, ${name}! Your message has been received. I'll get back to you soon at ${email}.`);
-
-    // Reset form
-    contactForm.reset();
-
-    // In a real application, you would send this data to a server
-    // Example:
-    // fetch('/api/contact', {
-    //     method: 'POST',
-    //     headers: { 'Content-Type': 'application/json' },
-    //     body: JSON.stringify({ name, email, subject, message })
-    // })
-    // .then(response => response.json())
-    // .then(data => {
-    //     alert('Message sent successfully!');
-    //     contactForm.reset();
-    // })
-    // .catch(error => {
-    //     alert('Error sending message. Please try again.');
-    // });
+    // Using Web3Forms API for reliable email forwarding
+    fetch('https://api.web3forms.com/submit', {
+        method: 'POST',
+        headers: { 
+            'Content-Type': 'application/json',
+            'Accept': 'application/json'
+        },
+        body: JSON.stringify({
+            access_key: 'f90dec90-d503-4ef0-8236-ad8a22065c5b',
+            name: name,
+            email: email,
+            subject: subject,
+            message: message
+        })
+    })
+    .then(async (response) => {
+        let json = await response.json();
+        if (response.status == 200) {
+            alert(`Thank you, ${name}! Your message has been sent successfully.`);
+            contactForm.reset();
+        } else {
+            console.error(response);
+            alert(json.message || 'Error sending message. Please try again.');
+        }
+    })
+    .catch(error => {
+        alert('Error sending message. Please try again.');
+        console.error('Error:', error);
+    })
+    .finally(() => {
+        // Restore button state
+        submitBtn.innerHTML = originalBtnText;
+        submitBtn.style.opacity = '1';
+        submitBtn.disabled = false;
+    });
 });
 
 // ===================================
