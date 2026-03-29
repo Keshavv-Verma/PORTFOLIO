@@ -58,7 +58,75 @@ function typeEffect() {
 // Start typing animation when page loads
 document.addEventListener('DOMContentLoaded', () => {
     setTimeout(typeEffect, 1000);
+    
+    // Create toast container if it doesn't exist
+    if (!document.querySelector('.toast-container')) {
+        const container = document.createElement('div');
+        container.className = 'toast-container';
+        document.body.appendChild(container);
+    }
 });
+
+// ===================================
+// Custom Toast System
+// ===================================
+
+function showToast(title, message, type = 'info', duration = 5000) {
+    const container = document.querySelector('.toast-container');
+    if (!container) return;
+
+    const toast = document.createElement('div');
+    toast.className = `toast toast-${type}`;
+    
+    const iconMap = {
+        success: 'fa-check-circle',
+        error: 'fa-exclamation-circle',
+        info: 'fa-info-circle'
+    };
+    
+    toast.innerHTML = `
+        <div class="toast-icon">
+            <i class="fas ${iconMap[type] || iconMap.info}"></i>
+        </div>
+        <div class="toast-content">
+            <div class="toast-title">${title}</div>
+            <div class="toast-message">${message}</div>
+        </div>
+        <button class="toast-close">
+            <i class="fas fa-times"></i>
+        </button>
+        <div class="toast-progress"></div>
+    `;
+
+    container.appendChild(toast);
+
+    // Trigger animation
+    requestAnimationFrame(() => {
+        toast.classList.add('show');
+    });
+
+    // Progress bar animation
+    const progress = toast.querySelector('.toast-progress');
+    progress.style.transitionDuration = `${duration}ms`;
+    progress.style.transform = 'scaleX(0)';
+
+    // Individual close button
+    const closeBtn = toast.querySelector('.toast-close');
+    closeBtn.addEventListener('click', () => removeToast(toast));
+
+    // Auto remove
+    const timeout = setTimeout(() => {
+        removeToast(toast);
+    }, duration);
+
+    function removeToast(el) {
+        clearTimeout(timeout);
+        el.classList.remove('show');
+        el.addEventListener('transitionend', () => {
+            el.remove();
+        }, { once: true });
+    }
+}
 
 // ===================================
 // Sticky Navbar & Scroll Progress
@@ -243,60 +311,193 @@ createParticles();
 // ===================================
 
 const contactForm = document.querySelector('.contact-form');
+const formInputs = document.getElementById('form-inputs');
+const otpSection = document.getElementById('otp-section');
+const otpEmailDisplay = document.getElementById('otp-email-display');
+const verifyOtpBtn = document.getElementById('verifyOtpBtn');
+const cancelOtpBtn = document.getElementById('cancelOtpBtn');
+const otpInput = document.getElementById('otp-input');
 
-contactForm.addEventListener('submit', (e) => {
+let generatedOTP = null;
+let currentFormData = null;
+
+async function sendOTP(email, name) {
+    try {
+        // --- OTP GENERATION & SENDING VIA EMAILJS ---
+        // 1. Generate 6-digit OTP and expiry time
+        generatedOTP = Math.floor(100000 + Math.random() * 900000).toString();
+        const expiryTime = new Date(Date.now() + 15 * 60000).toLocaleTimeString();
+        
+        // Debugging (Remove in Production)
+        console.log(`%c[DEBUG] Generated OTP: ${generatedOTP}`, 'color: #ec4899; font-weight: bold;');
+        
+        // 2. Send OTP to the user's email using EmailJS
+        const EMAILJS_SERVICE_ID = 'service_lpr6jjg'; 
+        const EMAILJS_TEMPLATE_ID = 'template_p9kbpku'; 
+        const EMAILJS_PUBLIC_KEY = 'Hk0hjpSAekyVTjmJE'; 
+        
+        if (EMAILJS_SERVICE_ID !== 'YOUR_SERVICE_ID') {
+            const emailjsResponse = await fetch('https://api.emailjs.com/api/v1.0/email/send', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    service_id: EMAILJS_SERVICE_ID,
+                    template_id: EMAILJS_TEMPLATE_ID,
+                    user_id: EMAILJS_PUBLIC_KEY,
+                    template_params: {
+                        to_email: email,
+                        to_name: name,
+                        passcode: generatedOTP,
+                        time: expiryTime
+                    }
+                })
+            });
+
+            if (!emailjsResponse.ok) {
+                const errorText = await emailjsResponse.text();
+                console.error("EmailJS Error Response:", errorText);
+                throw new Error(`EmailJS Error: ${errorText}`);
+            }
+        }
+        
+        return true;
+    } catch (error) {
+        showToast('System Error', `Failed to send code: ${error.message}`, 'error');
+        console.error('OTP Error:', error);
+        return false;
+    }
+}
+
+contactForm.addEventListener('submit', async (e) => {
     e.preventDefault();
 
-    const submitBtn = contactForm.querySelector('button[type="submit"]');
+    const submitBtn = document.getElementById('mainSubmitBtn');
     const originalBtnText = submitBtn.innerHTML;
     
     // Change button state to show loading
-    submitBtn.innerHTML = '<span>Sending...</span> <i class="fas fa-spinner fa-spin"></i>';
+    submitBtn.innerHTML = '<span>Sending OTP...</span> <i class="fas fa-spinner fa-spin"></i>';
     submitBtn.style.opacity = '0.7';
     submitBtn.disabled = true;
 
     // Get form data
-    const formData = new FormData(contactForm);
-    const name = formData.get('name');
-    const email = formData.get('email');
-    const subject = formData.get('subject');
-    const message = formData.get('message');
+    currentFormData = new FormData(contactForm);
+    const email = currentFormData.get('email');
+    const name = currentFormData.get('name');
 
-    // Using Web3Forms API for reliable email forwarding
-    fetch('https://api.web3forms.com/submit', {
-        method: 'POST',
-        headers: { 
-            'Content-Type': 'application/json',
-            'Accept': 'application/json'
-        },
-        body: JSON.stringify({
-            access_key: 'f90dec90-d503-4ef0-8236-ad8a22065c5b',
-            name: name,
-            email: email,
-            subject: subject,
-            message: message
-        })
-    })
-    .then(async (response) => {
-        let json = await response.json();
+    // Send the OTP using the refactored function
+    const success = await sendOTP(email, name);
+    
+    if (success) {
+        // Hide form inputs, show OTP section
+        formInputs.style.display = 'none';
+        otpSection.style.display = 'block';
+        otpEmailDisplay.textContent = email;
+        showToast('Code Sent!', `We've sent a verification code to ${email}`, 'info');
+    }
+
+    // Restore main button state
+    submitBtn.innerHTML = originalBtnText;
+    submitBtn.style.opacity = '1';
+    submitBtn.disabled = false;
+});
+
+// Resend OTP Link Handler
+const resendOtpBtn = document.getElementById('resendOtpBtn');
+
+resendOtpBtn.addEventListener('click', async (e) => {
+    e.preventDefault();
+    
+    if (!currentFormData) return;
+    
+    const email = currentFormData.get('email');
+    const name = currentFormData.get('name');
+    
+    resendOtpBtn.style.opacity = '0.5';
+    resendOtpBtn.style.pointerEvents = 'none';
+    resendOtpBtn.textContent = 'Resending...';
+    
+    const success = await sendOTP(email, name);
+    
+    if (success) {
+        showToast('Resent!', 'A new code has been sent to your email.', 'success');
+        otpInput.value = '';
+    }
+    
+    resendOtpBtn.style.opacity = '1';
+    resendOtpBtn.style.pointerEvents = 'auto';
+    resendOtpBtn.textContent = 'Resend OTP';
+});
+
+// Cancel OTP verification
+cancelOtpBtn.addEventListener('click', () => {
+    otpSection.style.display = 'none';
+    formInputs.style.display = 'block';
+    otpInput.value = '';
+    generatedOTP = null;
+});
+
+// Verify OTP and send message securely
+verifyOtpBtn.addEventListener('click', async () => {
+    // 1. Force string type and strip ALL non-numeric characters for comparison
+    const enteredOTP = otpInput.value.toString().replace(/\D/g, '').trim();
+    const expectedOTP = generatedOTP ? generatedOTP.toString().replace(/\D/g, '').trim() : '';
+    
+    // Debugging (Remove in Production)
+    console.log(`%c[DEBUG] Comparison: Entered[${enteredOTP}] vs Expected[${expectedOTP}]`, 'color: #8b5cf6;');
+    
+    if (!expectedOTP) {
+        showToast('Error', 'No verification code found. Please resend.', 'error');
+        return;
+    }
+    
+    if (enteredOTP !== expectedOTP) {
+        showToast('Verification Failed', 'The OTP code is incorrect. Please try again.', 'error');
+        return;
+    }
+
+    const originalBtnText = verifyOtpBtn.innerHTML;
+    verifyOtpBtn.innerHTML = '<span>Sending Message...</span> <i class="fas fa-spinner fa-spin"></i>';
+    verifyOtpBtn.style.opacity = '0.7';
+    verifyOtpBtn.disabled = true;
+
+    try {
+        // Using Web3Forms API for final email forwarding
+        const response = await fetch('https://api.web3forms.com/submit', {
+            method: 'POST',
+            headers: { 
+                'Content-Type': 'application/json',
+                'Accept': 'application/json'
+            },
+            body: JSON.stringify({
+                access_key: 'f90dec90-d503-4ef0-8236-ad8a22065c5b',
+                name: currentFormData.get('name'),
+                email: currentFormData.get('email'),
+                subject: currentFormData.get('subject'),
+                message: currentFormData.get('message')
+            })
+        });
+        
+        const json = await response.json();
         if (response.status == 200) {
-            alert(`Thank you, ${name}! Your message has been sent successfully.`);
+            showToast('Success!', `Thanks ${currentFormData.get('name')}, your message has been sent successfully.`, 'success');
             contactForm.reset();
+            otpSection.style.display = 'none';
+            formInputs.style.display = 'block';
+            otpInput.value = '';
         } else {
             console.error(response);
-            alert(json.message || 'Error sending message. Please try again.');
+            showToast('Submission Error', json.message || 'Error sending message. Please try again.', 'error');
         }
-    })
-    .catch(error => {
-        alert('Error sending message. Please try again.');
+    } catch (error) {
+        showToast('Connection Error', 'Failed to connect to the server. Please try again later.', 'error');
         console.error('Error:', error);
-    })
-    .finally(() => {
-        // Restore button state
-        submitBtn.innerHTML = originalBtnText;
-        submitBtn.style.opacity = '1';
-        submitBtn.disabled = false;
-    });
+    } finally {
+        verifyOtpBtn.innerHTML = originalBtnText;
+        verifyOtpBtn.style.opacity = '1';
+        verifyOtpBtn.disabled = false;
+    }
 });
 
 // ===================================
