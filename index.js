@@ -272,7 +272,7 @@ function createParticles() {
             top: ${y}%;
             width: ${size}px;
             height: ${size}px;
-            background: rgba(99, 102, 241, 0.5);
+            background: rgba(255, 255, 255, 0.15);
             border-radius: 50%;
             animation: float-particle ${duration}s ${delay}s infinite ease-in-out;
         `;

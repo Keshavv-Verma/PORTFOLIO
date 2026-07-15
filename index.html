@@ -11,7 +11,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link
-        href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Space+Grotesk:wght@400;500;600;700&display=swap"
+        href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700&family=Outfit:wght@300;400;500;600;700;800;900&display=swap"
         rel="stylesheet">
 
     <!-- Font Awesome -->
@@ -30,12 +30,10 @@
     <div class="particles" id="particles"></div>
 
     <!-- Sticky Navigation -->
-    <header id="navbar">
+    <header id="navbar" class="tn-navbar">
         <nav class="nav-container">
             <div class="logo">
-                <span class="logo-bracket">&lt;</span>
-                <span class="logo-text">Keshav</span>
-                <span class="logo-bracket">/&gt;</span>
+                <h1>&lt;Keshav <strong>Verma</strong>/&gt;</h1>
             </div>
             <ul class="nav-menu" id="navMenu">
                 <li><a href="#home" class="nav-link active">Home</a></li>
@@ -53,18 +51,18 @@
         <div class="progress-bar" id="progressBar"></div>
     </header>
 
-    <main>
-        <!-- Hero Section -->
-        <section id="home" class="hero-section">
-            <div class="hero-container">
-                <div class="hero-content" data-aos="fade-right" data-aos-duration="1000">
-                    <div class="hero-greeting">Hi, I'm</div>
-                    <h1 class="hero-name">Keshav Verma</h1>
-                    <div class="hero-title">
+    <div class="home-workspace">
+        <main>
+            <!-- Hero Section -->
+            <section id="home" class="home-hero">
+                <div class="hero-content" data-aos="fade-up" data-aos-duration="1000">
+                    <h4 class="hero-subtitle">Welcome to my space</h4>
+                    <h1 class="hero-title">Keshav Verma</h1>
+                    <div class="hero-title-type">
                         <span class="typing-text" id="typingText"></span>
                         <span class="cursor">|</span>
                     </div>
-                    <p class="hero-description">
+                    <p class="hero-desc">
                         Computer Science student passionate about solving complex problems through Data Structures,
                         Algorithms, and Java programming.
                     </p>
@@ -80,44 +78,25 @@
                     </div>
                     <div class="hero-stats">
                         <div class="stat-item" data-aos="fade-up" data-aos-delay="200">
-                            <div class="stat-number">350+</div>
+                            <div class="stat-number">500+</div>
                             <div class="stat-label">DSA Problems</div>
                         </div>
                         <div class="stat-item" data-aos="fade-up" data-aos-delay="400">
-                            <div class="stat-number">8.9</div>
+                            <div class="stat-number">9.01</div>
                             <div class="stat-label">GPA</div>
                         </div>
                     </div>
                 </div>
-                <div class="hero-image" data-aos="fade-left" data-aos-duration="1000">
-                    <div class="image-container">
-                        <div class="image-glow"></div>
-                        <div class="image-border"></div>
+                <div class="hero-showcase" data-aos="fade-up" data-aos-delay="600">
+                    <div class="hero-showcase-inner">
                         <img src="./assets/myself.jpeg" alt="Keshav Verma">
                     </div>
-                    <div class="floating-icons">
-                        <div class="float-icon" style="--delay: 0s; --x: -20px; --y: -30px;">
-                            <i class="fab fa-html5"></i>
-                        </div>
-                        <div class="float-icon" style="--delay: 1s; --x: 30px; --y: -20px;">
-                            <i class="fab fa-css3-alt"></i>
-                        </div>
-                        <div class="float-icon" style="--delay: 2s; --x: -30px; --y: 20px;">
-                            <i class="fab fa-js"></i>
-                        </div>
-                        <div class="float-icon" style="--delay: 3s; --x: 25px; --y: 30px;">
-                            <i class="fab fa-react"></i>
-                        </div>
-                    </div>
                 </div>
-            </div>
-            <div class="scroll-indicator" data-aos="fade-up" data-aos-delay="1000">
-                <div class="mouse">
-                    <div class="wheel"></div>
-                </div>
-                <div class="scroll-text">Scroll Down</div>
-            </div>
-        </section>
+                <button class="hero-scroll-btn" onclick="document.getElementById('about').scrollIntoView({behavior: 'smooth'})">
+                    <span>Scroll Down</span>
+                    <div class="scroll-indicator-line"></div>
+                </button>
+            </section>
 
         <!-- About Section -->
         <section id="about" class="about-section">
@@ -125,7 +104,6 @@
                 <div class="section-header" data-aos="fade-up">
                     <span class="section-tag">Get To Know</span>
                     <h2 class="section-title">About Me</h2>
-                    <div class="title-underline"></div>
                 </div>
                 <div class="about-content">
                     <div class="about-text" data-aos="fade-right" data-aos-delay="200">
@@ -188,7 +166,6 @@
                 <div class="section-header" data-aos="fade-up">
                     <span class="section-tag">What I Know</span>
                     <h2 class="section-title">My Skills</h2>
-                    <div class="title-underline"></div>
                 </div>
                 <div class="skills-grid">
                     <div class="skill-card" data-aos="zoom-in" data-aos-delay="100">
@@ -232,7 +209,6 @@
                 <div class="section-header" data-aos="fade-up">
                     <span class="section-tag">My Work</span>
                     <h2 class="section-title">Featured Projects</h2>
-                    <div class="title-underline"></div>
                 </div>
                 <div class="projects-container">
                     <div class="project-card" data-aos="fade-up" data-aos-delay="200">
@@ -321,7 +297,6 @@
                 <div class="section-header" data-aos="fade-up">
                     <span class="section-tag">Get In Touch</span>
                     <h2 class="section-title">Contact Me</h2>
-                    <div class="title-underline"></div>
                 </div>
                 <div class="contact-container">
                     <div class="contact-info" data-aos="fade-right" data-aos-delay="200">
@@ -439,6 +414,7 @@
             </div>
         </div>
     </footer>
+    </div>
 
     <!-- Back to Top Button -->
     <button id="backToTop" class="back-to-top" title="Back to Top">
