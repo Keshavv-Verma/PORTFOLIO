@@ -20,7 +20,7 @@ const phrases = [
     'CS Student',
     'DSA Enthusiast',
     'Java Developer',
-    'Problem Solver',
+    'Problem Solver',   
 ];
 
 let phraseIndex = 0;

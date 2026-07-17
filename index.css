@@ -836,7 +836,7 @@ section {
     position: relative;
     aspect-ratio: 1.7;
     overflow: hidden;
-    background: #ffffff;
+    background: transparent;
     border-bottom: 1px solid var(--border-color);
 }
 
