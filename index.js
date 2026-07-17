@@ -21,7 +21,6 @@ const phrases = [
     'DSA Enthusiast',
     'Java Developer',
     'Problem Solver',
-    'Competitive Programmer'
 ];
 
 let phraseIndex = 0;
