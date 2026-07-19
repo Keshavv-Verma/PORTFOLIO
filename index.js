@@ -161,11 +161,32 @@ hamburger.addEventListener('click', () => {
     navMenu.classList.toggle('active');
 });
 
-// Close mobile menu when clicking on a link
+// Unified nav link handler: smooth scroll + close mobile menu + immediate active state
 navLinks.forEach(link => {
-    link.addEventListener('click', () => {
-        hamburger.classList.remove('active');
-        navMenu.classList.remove('active');
+    link.addEventListener('click', (e) => {
+        const href = link.getAttribute('href');
+
+        // If it's an in-page anchor, handle smooth scroll
+        if (href && href.startsWith('#')) {
+            e.preventDefault();
+            const targetSection = document.querySelector(href);
+
+            if (targetSection) {
+                const headerOffset = navbar ? navbar.offsetHeight : 80;
+                const offsetTop = targetSection.getBoundingClientRect().top + window.pageYOffset - headerOffset - 8;
+
+                window.scrollTo({ top: offsetTop, behavior: 'smooth' });
+
+                // Close mobile menu if open
+                hamburger.classList.remove('active');
+                navMenu.classList.remove('active');
+
+                // Update active class immediately for better UX
+                navLinks.forEach(l => l.classList.remove('active'));
+                link.classList.add('active');
+            }
+        }
+        // Otherwise, let the browser handle external links
     });
 });
 
@@ -178,11 +199,13 @@ const sections = document.querySelectorAll('section');
 function setActiveLink() {
     let currentSection = '';
 
+    const scrollPos = window.pageYOffset || document.documentElement.scrollTop;
+
     sections.forEach(section => {
-        const sectionTop = section.offsetTop;
+        const sectionTop = section.getBoundingClientRect().top + window.pageYOffset;
         const sectionHeight = section.clientHeight;
 
-        if (window.scrollY >= sectionTop - 200) {
+        if (scrollPos >= sectionTop - (navbar ? navbar.offsetHeight + 120 : 200)) {
             currentSection = section.getAttribute('id');
         }
     });
@@ -196,28 +219,6 @@ function setActiveLink() {
 }
 
 window.addEventListener('scroll', setActiveLink);
-
-// ===================================
-// Smooth Scroll for Navigation Links
-// ===================================
-
-navLinks.forEach(link => {
-    link.addEventListener('click', (e) => {
-        e.preventDefault();
-        const targetId = link.getAttribute('href');
-        const targetSection = document.querySelector(targetId);
-
-        if (targetSection) {
-            const offsetTop = targetSection.offsetTop - 80;
-            window.scrollTo({
-                top: offsetTop,
-                behavior: 'smooth'
-            });
-        }
-    });
-});
-
-
 
 // ===================================
 // Back to Top Button

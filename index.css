@@ -46,6 +46,10 @@ html {
     overflow-x: hidden;
 }
 
+section {
+    scroll-margin-top: 72px;
+}
+
 body {
     font-family: var(--font-sans);
     background: linear-gradient(180deg, #050505 0%, #0a0a0a 30%, #0e0e0e 60%, #080808 100%);
