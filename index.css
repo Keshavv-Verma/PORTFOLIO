@@ -239,6 +239,50 @@ body {
     transition: width 0.1s ease;
 }
 
+/* Floating Social (top-right) - subtle glass look so it blends naturally with header */
+.floating-social {
+    position: fixed;
+    /* position below the navbar (navbar height is 64px) */
+    top: calc(64px + 12px);
+    right: 20px;
+    display: flex;
+    gap: 10px;
+    z-index: 10010;
+    align-items: center;
+    pointer-events: auto;
+}
+.floating-social .social-link {
+    display: inline-flex;
+    width: 40px;
+    height: 40px;
+    border-radius: 10px;
+    align-items: center;
+    justify-content: center;
+    color: var(--text-primary);
+    background: rgba(255,255,255,0.03);
+    border: 1px solid rgba(255,255,255,0.04);
+    transition: transform 0.22s var(--ease), background 0.22s var(--ease), box-shadow 0.22s var(--ease);
+    backdrop-filter: blur(6px);
+    -webkit-backdrop-filter: blur(6px);
+    text-decoration: none;
+}
+.floating-social .social-link i { font-size: 16px; color: var(--text-primary); }
+.floating-social .social-link:hover {
+    transform: translateY(-4px) scale(1.03);
+    background: linear-gradient(135deg, rgba(255,255,255,0.04), rgba(255,255,255,0.02));
+    box-shadow: 0 6px 18px rgba(0,0,0,0.55);
+    color: var(--text-primary);
+}
+@media (max-width: 768px) {
+    .floating-social {
+        /* slightly lower on mobile as well */
+        top: calc(56px + 10px);
+        right: 10px;
+        gap: 8px;
+    }
+    .floating-social .social-link { width: 36px; height:36px; border-radius:8px; }
+}
+
 /* Hamburger */
 .hamburger {
     display: none;
